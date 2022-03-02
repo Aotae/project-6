@@ -10,7 +10,7 @@ class Checkpoint(EmbeddedDocument):
 		close_time: MongoEngine datetime field, required, (checkpoint closing time).
     """
     distance = FloatField(required = True)
-    location = StringField(required = False)
+    location = StringField()
     open_time = DateTimeField(required = True)
     close_time = DateTimeField(required = True)
 
