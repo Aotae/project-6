@@ -124,11 +124,11 @@ def display():
    # Checkpoints = table['Checkpoints']
    # client.close()
    # return flask.jsonify(status=200,brevets={"Start":Start,"MaxDist":MaxDist, "Checkpoints":Checkpoints})
-   table = requests.get("http://api:{API_PORT}/api/Brevets").json()
+   table = requests.get(f"http://api:{API_PORT}/api/Brevets").json()
    return flask.jsonify(brevets={
        "Start":table[-1]['start_time'],
        "MaxDist":table[-1]['length'],
-       "Controls":table[-1]['checkpoints']},status=200)
+       "Checkpoints":table[-1]['checkpoints']},status=200)
     
 #############
 if __name__ == "__main__":

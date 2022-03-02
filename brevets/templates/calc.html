@@ -203,9 +203,9 @@ one.  We allocate it the full 12 columns of the bootstrap grid.
                     console.log("We got into a bad status")
                     return;
                 }
-                var Start = data.brevets['Start'];
+                var Start = moment(data.brevets['Start']).format("YYYY-MM-DDTHH:mm");
                 var MaxDist = data.brevets['MaxDist'];
-                var Checkpoints = JSON.parse(data.brevets['Checkpoints']);
+                var Checkpoints = data.brevets['Checkpoints'];
                 $('#brevet_dist_km').val(MaxDist);
                 $('#begin_date').val(Start);
                 console.log("brevets and begin");
@@ -215,12 +215,13 @@ one.  We allocate it the full 12 columns of the bootstrap grid.
                 var open = $("[name='open']");
                 var close = $("[name='close']");
                 console.log("mkmloc");
+
                 for (let i = 0; i < Checkpoints.length; i++) {
-                    km[i].value = Checkpoints[i]['km'];
-                    mile[i].value = Checkpoints[i]['mi'];
-                    location[i].value = Checkpoints[i]['locations'];
-                    open[i].value = Checkpoints[i]['opens'];
-                    close[i].value = Checkpoints[i]['closes'];
+                    km[i].value = Checkpoints[i]['distance'];
+                    mile[i].value = Checkpoints[i]['distance'];
+                    location[i].value = Checkpoints[i]['location'];
+                    open[i].value = Checkpoints[i]['open_time'];
+                    close[i].value = Checkpoints[i]['close_time'];
                 }
             }
         );
