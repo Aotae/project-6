@@ -155,7 +155,7 @@ one.  We allocate it the full 12 columns of the bootstrap grid.
     }
     function submit_f() {
         var maxdist = $('#brevet_dist_km').val();
-        var startdate = $('#begin_date').val();
+        var startdate =String( $('#begin_date').val()).replace("T"," ");
         var mile = $("[name='miles']");
         var km = $("[name='km']");
         var location = $("[name='location']");
@@ -166,11 +166,11 @@ one.  We allocate it the full 12 columns of the bootstrap grid.
         for (let i = 0; i < 20; i++) {
             if (km[i].value) {
                 controles.push({
-                    "km": km[i].value,
-                    "mi": mile[i].value,
-                    "locations": location[i].value,
-                    "opens": open[i].value,
-                    "closes": close[i].value
+                    "distance": km[i].value,
+                    //"mi": mile[i].value,
+                    "location": location[i].value,
+                    "open_time": String(open[i].value).replace("T", " "),
+                    "close_time": String(close[i].value).replace("T", " ")
                 });
             }
         }
@@ -181,7 +181,18 @@ one.  We allocate it the full 12 columns of the bootstrap grid.
             open[i].value = null;
             close[i].value = null;
         }
-        $.post(SCRIPT_ROOT + "/submit", {"Start":startdate,"MaxDist":maxdist,"Controls":JSON.stringify(controles)})
+
+        $.ajax(SCRIPT_ROOT + "/submit",
+            {
+                dataType: 'json',
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    "MaxDist": maxdist,
+                    "Start": startdate,
+                    "Controls": controles
+                })
+            });
     }
     function display_f(){
         $.getJSON(SCRIPT_ROOT + "/display").done(

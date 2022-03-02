@@ -97,12 +97,12 @@ def submit():
     # return insert(request)
     table = request.get_json()
     stuff = {
-        "start_time":table['Start'],
         "length":table['MaxDist'],
+        "start_time":table['Start'],
         "checkpoints":table['Controls']
         }
-    req = request.post(f"http://api:{API_PORT}/api/Brevets", json=stuff)
-    app.logger.debug("code",req.status_code)
+    req = requests.post(f"http://api:{API_PORT}/api/Brevets", json=stuff)
+    app.logger.debug(req.status_code)
     return flask.Response(status=req.status_code)
 
 

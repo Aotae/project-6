@@ -17,6 +17,6 @@ myapi.add_resource(BrevetAPI,"/api/Brevet/<id>")
 myapi.add_resource(BrevetsAPI,"/api/Brevets")
 
 if __name__ == "__main__":
-    print("THE API PORT ", API_PORT)
+    print("OPEN ON API", API_PORT)
     print("Opening api for global access on port {}".format(API_PORT))
     app.run(port=API_PORT, host="0.0.0.0")
