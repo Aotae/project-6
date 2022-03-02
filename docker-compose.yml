@@ -15,7 +15,7 @@ services:
             DEBUG: "True"
     api:
         build: api/.
-        command: app.py -P $API_PORT
+        command: api.py -P $API_PORT
         ports:
             - "5001:$API_PORT"
         depends_on:
