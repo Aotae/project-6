@@ -3,7 +3,7 @@ version: '3'
 services:
     brevets:
         build: brevets/.
-        command: python -u flask_brevets.py -P $BREVETS_PORT
+        command: flask_brevets.py -P $BREVETS_PORT
         ports:
             - "5000:$BREVETS_PORT"
         depends_on:
@@ -15,7 +15,7 @@ services:
             DEBUG: "True"
     api:
         build: api/.
-        command: python -u api.py -P $API_PORT
+        command: app.py -P $API_PORT
         ports:
             - "5001:$API_PORT"
         depends_on:

@@ -8,8 +8,9 @@ import flask
 from flask import request
 import arrow  # Replacement for datetime, based on moment.js
 import acp_times  # Brevet time calculations
-import config
 import pymongo
+import requests
+import datetime
 import os
 from pymongo import MongoClient
 
@@ -19,30 +20,36 @@ import logging
 # Globals
 ###
 app = flask.Flask(__name__)
-CONFIG = config.configuration()
+app.logger.setLevel(logging.DEBUG)
+#ENV VAR (these don't work on my native windows machine for 
+#some reason but it does work in the docker container
+#gonna take a while tweaking my windows dev env at some point
+
+BREVETS_PORT = os.environ.get('BREVETS_PORT')
+API_PORT = os.environ.get('API_PORT')
 
 ###
 # Pages
 ###
 def insert(request):
-    app.logger.debug("Hey we submitted")
-    client = MongoClient('mongodb://' + os.environ['MONGODB_HOSTNAME'],27017)
-    if not request:
-        return 403
-    formtable = request.form['Controls']
-    if formtable == "[]":
-        return 403
-    else:
-        table = {
-            'Start': request.form['Start'],
-            'MaxDist': request.form['MaxDist'],
-            'Checkpoints': request.form['Controls']
-            }
-        mdb = client.mydb
-        mdb.posts.insert_one(table)
-        client.close()
-        return 200
-
+   # app.logger.debug("Hey we submitted")
+   # client = MongoClient('mongodb://' + os.environ['MONGODB_HOSTNAME'],27017)
+   # if not request:
+   #     return 403
+   # formtable = request.form['Controls']
+   # if formtable == "[]":
+   #     return 403
+   # else:
+   #     table = {
+   #         'Start': request.form['Start'],
+   #         'MaxDist': request.form['MaxDist'],
+   #         'Checkpoints': request.form['Controls']
+   #         }
+   #     mdb = client.mydb
+   #     mdb.posts.insert_one(table)
+   #     client.close()
+   #     return 200
+   pass
 
 @app.route("/")
 @app.route("/index")
@@ -87,35 +94,43 @@ def _calc_times():
 
 @app.route("/submit",methods=['POST'])
 def submit():
-    return insert(request)
+    # return insert(request)
+    table = request.get_json()
+    stuff = {
+        "start_time":table['Start'],
+        "length":table['MaxDist'],
+        "checkpoints":table['Controls']
+        }
+    req = request.post(f"http://api:{API_PORT}/api/Brevets", json=stuff)
+    app.logger.debug("code",req.status_code)
+    return flask.Response(status=req.status_code)
 
 
 @app.route("/display")
 def display():
-    app.logger.debug("Hey we're trying to display")
-    client = MongoClient('mongodb://'+os.environ['MONGODB_HOSTNAME'],27017)
-    if not client:
-        app.logger.debug("Client is no?")
-        raise Exception('bad connection with db')
-        return flask.jsonify(status=500,brevets={"Start":"","MaxDist":"", "Checkpoints":""})
-    mdb = client.mydb
-    table = mdb.posts.find_one(sort=[('_id', pymongo.DESCENDING)])
-    if not table:
-        raise Exception('table of controle times not found')
-        return flask.jsonify(status=404,brevets={"Start":"","MaxDist":"", "Checkpoints":""})
-    Start = table['Start']
-    MaxDist = table['MaxDist']
-    Checkpoints = table['Checkpoints']
-    client.close()
-    return flask.jsonify(status=200,brevets={"Start":Start,"MaxDist":MaxDist, "Checkpoints":Checkpoints})
-
+   # app.logger.debug("Hey we're trying to display")
+   # client = MongoClient('mongodb://'+os.environ['MONGODB_HOSTNAME'],27017)
+   # if not client:
+   #     app.logger.debug("Client is no?")
+   #     raise Exception('bad connection with db')
+   #     return flask.jsonify(status=500,brevets={"Start":"","MaxDist":"", "Checkpoints":""})
+   # mdb = client.mydb
+   # table = mdb.posts.find_one(sort=[('_id', pymongo.DESCENDING)])
+   # if not table:
+   #     raise Exception('table of controle times not found')
+   #     return flask.jsonify(status=404,brevets={"Start":"","MaxDist":"", "Checkpoints":""})
+   # Start = table['Start']
+   # MaxDist = table['MaxDist']
+   # Checkpoints = table['Checkpoints']
+   # client.close()
+   # return flask.jsonify(status=200,brevets={"Start":Start,"MaxDist":MaxDist, "Checkpoints":Checkpoints})
+   table = requests.get("http://api:{API_PORT}/api/Brevets").json()
+   return flask.jsonify(brevets={
+       "Start":table[-1]['start_time'],
+       "MaxDist":table[-1]['length'],
+       "Controls":table[-1]['checkpoints']},status=200)
     
 #############
-
-app.debug = CONFIG.DEBUG
-if app.debug:
-    app.logger.setLevel(logging.DEBUG)
-
 if __name__ == "__main__":
-    print("Opening for global access on port {}".format(CONFIG.PORT))
-    app.run(port=CONFIG.PORT, host="0.0.0.0")
+    print("Opening for global access on port {}".format(BREVETS_PORT))
+    app.run(port = BREVETS_PORT, host="0.0.0.0")
