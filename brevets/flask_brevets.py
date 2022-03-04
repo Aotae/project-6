@@ -101,7 +101,7 @@ def submit():
         "start_time":table['Start'],
         "checkpoints":table['Controls']
         }
-    req = requests.post(f"http://api:{API_PORT}/api/Brevets", json=stuff)
+    req = requests.post(f"http://api:{API_PORT}/api/brevets", json=stuff)
     app.logger.debug(req.status_code)
     return flask.Response(status=req.status_code)
 
@@ -124,7 +124,7 @@ def display():
    # Checkpoints = table['Checkpoints']
    # client.close()
    # return flask.jsonify(status=200,brevets={"Start":Start,"MaxDist":MaxDist, "Checkpoints":Checkpoints})
-   table = requests.get(f"http://api:{API_PORT}/api/Brevets").json()
+   table = requests.get(f"http://api:{API_PORT}/api/brevets").json()
    return flask.jsonify(brevets={
        "Start":table[-1]['start_time'],
        "MaxDist":table[-1]['length'],
