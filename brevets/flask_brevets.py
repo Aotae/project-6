@@ -24,10 +24,10 @@ app.logger.setLevel(logging.DEBUG)
 #ENV VAR (these don't work on my native windows machine for 
 #some reason but it does work in the docker container
 #gonna take a while tweaking my windows dev env at some point
-
 BREVETS_PORT = os.environ.get('BREVETS_PORT')
 API_PORT = os.environ.get('API_PORT')
 
+app.logger.debug(API_PORT)
 ###
 # Pages
 ###
@@ -101,7 +101,7 @@ def submit():
         "start_time":table['Start'],
         "checkpoints":table['Controls']
         }
-    req = requests.post(f"http://api:{API_PORT}/api/Brevets", json=stuff)
+    req = requests.post(f"http://api:{API_PORT}/api/brevets", json=stuff)
     app.logger.debug(req.status_code)
     return flask.Response(status=req.status_code)
 
@@ -124,7 +124,7 @@ def display():
    # Checkpoints = table['Checkpoints']
    # client.close()
    # return flask.jsonify(status=200,brevets={"Start":Start,"MaxDist":MaxDist, "Checkpoints":Checkpoints})
-   table = requests.get(f"http://api:{API_PORT}/api/Brevets").json()
+   table = requests.get(f"http://api:{API_PORT}/api/brevets").json()
    return flask.jsonify(brevets={
        "Start":table[-1]['start_time'],
        "MaxDist":table[-1]['length'],

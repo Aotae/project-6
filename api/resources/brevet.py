@@ -1,5 +1,5 @@
 from flask import Response, request
-from database import Brevets
+from database.models import Brevets
 from flask_restful import Resource
  
 
